@@ -16,7 +16,7 @@ def associate_by_email(details, user=None, *args, **kwargs):
         # only if it's a single object. AuthException is raised if multiple
         # objects are returned
         try:
-            return {'user': UserSocialAuth.get_user_by_email(email=email)}
+            return {'user': UserSocialAuth.get_user_by_email(email__iexact=email)}
         except MultipleObjectsReturned:
             raise AuthException(kwargs['backend'], 'Not unique email address.')
         except ObjectDoesNotExist:
