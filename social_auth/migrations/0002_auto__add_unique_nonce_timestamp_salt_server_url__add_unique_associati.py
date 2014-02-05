@@ -7,10 +7,10 @@ from social_auth.models import Nonce, Association
 
 class Migration(SchemaMigration):
     def forwards(self, orm):
-        db.create_index(Nonce._meta.db_table, ['timestamp'])
+        # db.create_index(Nonce._meta.db_table, ['timestamp'])
         db.create_unique(Nonce._meta.db_table, ['timestamp', 'salt',
                                                 'server_url'])
-        db.create_index(Association._meta.db_table, ['issued'])
+        # db.create_index(Association._meta.db_table, ['issued'])
         db.create_unique(Association._meta.db_table, ['handle', 'server_url'])
 
     def backwards(self, orm):
