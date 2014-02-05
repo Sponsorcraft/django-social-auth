@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from openid.association import Association as OIDAssociation
 
-from social_auth.utils import utc
+from social_auth.utils import setting, utc
 
 # django.contrib.auth and mongoengine.django.auth regex to validate usernames
 # '^[\w@.+-_]+$', we use the opposite to clean invalid characters
@@ -56,9 +56,10 @@ class UserSocialAuthMixin(object):
         timedelta is inferred from current time (using UTC timezone). None is
         returned if there's no value stored or it's invalid.
         """
-        if self.extra_data and 'expires' in self.extra_data:
+        name = setting('SOCIAL_AUTH_EXPIRATION', 'expires')
+        if self.extra_data and name in self.extra_data:
             try:
-                expires = int(self.extra_data['expires'])
+                expires = int(self.extra_data.get(name))
             except (ValueError, TypeError):
                 return None
 
@@ -79,10 +80,6 @@ class UserSocialAuthMixin(object):
 
     @classmethod
     def username_max_length(cls):
-        raise NotImplementedError('Implement in subclass')
-
-    @classmethod
-    def email_max_length(cls):
         raise NotImplementedError('Implement in subclass')
 
     @classmethod
@@ -109,7 +106,6 @@ class UserSocialAuthMixin(object):
         """
         Return True/False if a User instance exists with the given arguments.
         Arguments are directly passed to filter() manager method.
-        TODO: consider how to ensure case-insensitive email matching
         """
         return cls.user_model().objects.filter(*args, **kwargs).count() > 0
 
@@ -128,7 +124,6 @@ class UserSocialAuthMixin(object):
 
     @classmethod
     def get_user_by_email(cls, email):
-        "Case insensitive search"
         return cls.user_model().objects.get(email__iexact=email)
 
     @classmethod
